@@ -38,7 +38,7 @@ app.post('/webhook', async (req, res) => {
 
         // Claude AI দিয়ে উত্তর তৈরি
         const response = await client.messages.create({
-          model: 'claude-sonnet-4-20250514',
+          model: 'claude-sonnet-4-5',
           max_tokens: 500,
           messages: [
             {
