@@ -1,6 +1,7 @@
 "use client";
 
-import { JOB_CATEGORIES, JOB_TYPES } from "@/lib/jobs";
+import { JOB_CATEGORIES, JOB_TYPES, JOBS } from "@/lib/jobs";
+import { SlidersHorizontal, X } from "lucide-react";
 
 type Props = {
   selectedCategory: string;
@@ -9,77 +10,93 @@ type Props = {
   onTypeChange: (t: string) => void;
 };
 
-export default function FilterPanel({
-  selectedCategory,
-  selectedType,
-  onCategoryChange,
-  onTypeChange,
-}: Props) {
+function countByCategory(cat: string) {
+  return JOBS.filter((j) => j.category === cat).length;
+}
+
+function countByType(type: string) {
+  return JOBS.filter((j) => j.type === type).length;
+}
+
+const hasFilters = (cat: string, type: string) => cat !== "" || type !== "";
+
+export default function FilterPanel({ selectedCategory, selectedType, onCategoryChange, onTypeChange }: Props) {
   return (
-    <aside className="bg-white rounded-xl border border-gray-200 shadow-sm p-5 space-y-6 h-fit">
-      <div>
-        <h3 className="font-semibold text-gray-800 mb-3 text-sm uppercase tracking-wide">
-          ক্যাটাগরি
-        </h3>
-        <div className="space-y-1">
-          {JOB_CATEGORIES.map((cat) => (
-            <button
-              key={cat}
-              onClick={() => onCategoryChange(cat)}
-              className={`w-full text-left px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                selectedCategory === cat
-                  ? "bg-blue-600 text-white"
-                  : "text-gray-600 hover:bg-blue-50 hover:text-blue-700"
-              }`}
-            >
-              {cat === "All" ? "সব ক্যাটাগরি" : cat}
-            </button>
-          ))}
+    <aside className="bg-white border border-[#E0E0E0] rounded-xl overflow-hidden">
+      {/* Header */}
+      <div className="flex items-center justify-between px-4 py-3 border-b border-[#E0E0E0]">
+        <div className="flex items-center gap-2 text-sm font-semibold text-black">
+          <SlidersHorizontal className="w-4 h-4 text-[#0A66C2]" />
+          Filters
         </div>
-      </div>
-
-      <div>
-        <h3 className="font-semibold text-gray-800 mb-3 text-sm uppercase tracking-wide">
-          চাকরির ধরন
-        </h3>
-        <div className="space-y-1">
+        {hasFilters(selectedCategory, selectedType) && (
           <button
-            onClick={() => onTypeChange("")}
-            className={`w-full text-left px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-              selectedType === ""
-                ? "bg-blue-600 text-white"
-                : "text-gray-600 hover:bg-blue-50 hover:text-blue-700"
-            }`}
+            onClick={() => { onCategoryChange(""); onTypeChange(""); }}
+            className="flex items-center gap-1 text-xs text-[#0A66C2] font-semibold hover:underline"
           >
-            সব ধরন
+            <X className="w-3 h-3" />
+            Clear all
           </button>
+        )}
+      </div>
+
+      {/* Job Type */}
+      <div className="px-4 py-4 border-b border-[#E0E0E0]">
+        <h3 className="text-xs font-bold text-black uppercase tracking-wider mb-3">Job Type</h3>
+        <div className="space-y-2">
           {JOB_TYPES.map((type) => (
-            <button
-              key={type}
-              onClick={() => onTypeChange(type)}
-              className={`w-full text-left px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                selectedType === type
-                  ? "bg-blue-600 text-white"
-                  : "text-gray-600 hover:bg-blue-50 hover:text-blue-700"
-              }`}
-            >
-              {type}
-            </button>
+            <label key={type} className="flex items-center justify-between cursor-pointer group">
+              <div className="flex items-center gap-2.5">
+                <div
+                  onClick={() => onTypeChange(selectedType === type ? "" : type)}
+                  className={`w-4 h-4 rounded border-2 flex items-center justify-center transition-colors cursor-pointer ${
+                    selectedType === type
+                      ? "bg-[#0A66C2] border-[#0A66C2]"
+                      : "border-[#999] group-hover:border-[#0A66C2]"
+                  }`}
+                >
+                  {selectedType === type && (
+                    <svg className="w-2.5 h-2.5 text-white" fill="none" viewBox="0 0 12 12">
+                      <path d="M2 6l3 3 5-5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                  )}
+                </div>
+                <span className="text-sm text-[#333] group-hover:text-black font-medium">{type}</span>
+              </div>
+              <span className="text-xs text-[#999] font-medium tabular-nums">{countByType(type)}</span>
+            </label>
           ))}
         </div>
       </div>
 
-      {(selectedCategory !== "All" || selectedType !== "") && (
-        <button
-          onClick={() => {
-            onCategoryChange("All");
-            onTypeChange("");
-          }}
-          className="w-full text-center text-sm text-red-500 hover:text-red-700 font-medium py-2 border border-red-200 rounded-lg hover:bg-red-50 transition-colors"
-        >
-          ফিল্টার রিসেট করুন
-        </button>
-      )}
+      {/* Category */}
+      <div className="px-4 py-4">
+        <h3 className="text-xs font-bold text-black uppercase tracking-wider mb-3">Category</h3>
+        <div className="space-y-2">
+          {JOB_CATEGORIES.map((cat) => (
+            <label key={cat} className="flex items-center justify-between cursor-pointer group">
+              <div className="flex items-center gap-2.5">
+                <div
+                  onClick={() => onCategoryChange(selectedCategory === cat ? "" : cat)}
+                  className={`w-4 h-4 rounded border-2 flex items-center justify-center transition-colors cursor-pointer ${
+                    selectedCategory === cat
+                      ? "bg-[#0A66C2] border-[#0A66C2]"
+                      : "border-[#999] group-hover:border-[#0A66C2]"
+                  }`}
+                >
+                  {selectedCategory === cat && (
+                    <svg className="w-2.5 h-2.5 text-white" fill="none" viewBox="0 0 12 12">
+                      <path d="M2 6l3 3 5-5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                  )}
+                </div>
+                <span className="text-sm text-[#333] group-hover:text-black font-medium">{cat}</span>
+              </div>
+              <span className="text-xs text-[#999] font-medium tabular-nums">{countByCategory(cat)}</span>
+            </label>
+          ))}
+        </div>
+      </div>
     </aside>
   );
 }
